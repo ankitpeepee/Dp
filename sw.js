@@ -1,8 +1,8 @@
-const CACHE_NAME = 'dimple-parlour-v3';
+const CACHE_NAME = 'dimple-parlour-v4';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
+  '/Dp/',
+  '/Dp/index.html',
+  '/Dp/manifest.json',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
@@ -46,4 +46,3 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
-
