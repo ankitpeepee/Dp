@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dimple's Parlour Appointments</title>
     
-    <!-- PWA Requirements -->
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA Manifest & Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#ec4899">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dimple Parlour">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3138/3138316.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -49,13 +53,16 @@
             </div>
         </header>
 
-        <!-- Custom PWA Install Banner (Manual trigger popup if browser supports) -->
-        <div id="installBanner" class="hidden bg-pink-100 border border-pink-300 p-3 rounded-xl mb-4 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-mobile-screen-button text-pink-600 text-lg"></i>
-                <span class="text-xs font-bold text-pink-900">App ko phone mein Install karein!</span>
+        <!-- Dynamic Install App Banner Popup -->
+        <div id="pwaInstallCard" class="hidden bg-gradient-to-r from-pink-600 to-rose-600 text-white p-3.5 rounded-2xl shadow-lg mb-4 flex justify-between items-center animate-bounce">
+            <div class="flex items-center space-x-2.5">
+                <i class="fa-solid fa-download text-xl"></i>
+                <div>
+                    <div class="text-xs font-bold">App Install Karein!</div>
+                    <div class="text-[10px] text-pink-100">Fast experience ke liye home screen par add karein</div>
+                </div>
             </div>
-            <button id="installAppBtn" class="bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition">
+            <button id="pwaInstallBtn" class="bg-white text-pink-600 font-bold text-xs px-3 py-1.5 rounded-xl shadow hover:bg-pink-50 transition">
                 Install App
             </button>
         </div>
@@ -98,7 +105,6 @@
             <!-- Tab 3: Revenue Report Box -->
             <div id="section-revenue" class="tab-section hidden bg-purple-50/70 p-4 sm:p-5 rounded-2xl shadow-md border border-purple-200 space-y-3">
                 
-                <!-- Backup & Restore Options -->
                 <div class="bg-white/80 border border-purple-200 p-2.5 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
                     <span class="text-xs font-bold text-purple-900 flex items-center">
                         <i class="fa-solid fa-database text-purple-600 mr-1.5"></i> Data Management:
@@ -137,7 +143,6 @@
                     </div>
                 </div>
 
-                <!-- Customer Wise Breakdown -->
                 <div class="mt-2 pt-2 border-t border-purple-200/60">
                     <div class="text-[11px] font-bold text-gray-700 mb-1.5 flex justify-between items-center">
                         <span>Customer-wise Payment Breakdown:</span>
@@ -208,7 +213,7 @@
         </div>
     </div>
 
-    <!-- Fixed Bottom Navigation Menu Bar -->
+    <!-- Navigation Menu Bar -->
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-2xl px-3 py-2.5 flex justify-around items-center z-40 max-w-lg mx-auto rounded-t-2xl">
         <button onclick="switchTab('upcoming')" id="nav-upcoming" class="flex flex-col items-center text-pink-600 transition p-1 focus:outline-none">
             <i class="fa-solid fa-clock text-lg mb-1"></i>
@@ -228,7 +233,7 @@
         </button>
     </div>
 
-    <!-- Modals (Payment, Delete, Cancel, Offline) -->
+    <!-- Modals -->
     <div id="paymentModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-gray-200">
             <h3 id="modalTitle" class="text-sm font-bold text-gray-900 mb-3 flex items-center">
@@ -315,40 +320,38 @@
         <span id="toastMessage">Success message</span>
     </div>
 
-    <!-- PWA Registration & Main Script -->
+    <!-- Register PWA Service Worker -->
     <script>
-        // Register Service Worker for PWA Installation
+        let pwaDeferredPrompt;
+        
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered!', reg))
-                    .catch(err => console.error('Service Worker Registration Failed!', err));
+                navigator.serviceWorker.register('./sw.js', { scope: './' })
+                    .then(reg => console.log('SW Registered:', reg.scope))
+                    .catch(err => console.error('SW Error:', err));
             });
         }
 
-        // Catch PWA Install Prompt
-        let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
-            deferredPrompt = e;
-            const installBanner = document.getElementById('installBanner');
-            if (installBanner) installBanner.classList.remove('hidden');
+            pwaDeferredPrompt = e;
+            const banner = document.getElementById('pwaInstallCard');
+            if (banner) banner.classList.remove('hidden');
         });
 
-        document.getElementById('installAppBtn')?.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+        document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => {
+            if (pwaDeferredPrompt) {
+                pwaDeferredPrompt.prompt();
+                const { outcome } = await pwaDeferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    console.log('User accepted the install prompt');
+                    document.getElementById('pwaInstallCard')?.classList.add('hidden');
                 }
-                deferredPrompt = null;
-                document.getElementById('installBanner')?.classList.add('hidden');
+                pwaDeferredPrompt = null;
             }
         });
     </script>
 
-    <!-- Firebase SDK & Database Logic -->
+    <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
