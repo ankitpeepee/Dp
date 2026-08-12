@@ -6,7 +6,7 @@
     <title>Dimple's Parlour Appointments</title>
     
     <!-- PWA Manifest & Meta Tags -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#ec4899">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -327,8 +327,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js', { scope: './' })
-                    .then(reg => console.log('SW Registered:', reg.scope))
-                    .catch(err => console.error('SW Error:', err));
+                    .then(reg => console.log('SW Registered successfully:', reg.scope))
+                    .catch(err => console.error('SW Registration Failed:', err));
             });
         }
 
@@ -348,6 +348,12 @@
                 }
                 pwaDeferredPrompt = null;
             }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('pwaInstallCard')?.classList.add('hidden');
+            pwaDeferredPrompt = null;
+            console.log('PWA installed successfully');
         });
     </script>
 
@@ -466,7 +472,7 @@
             const timeText = appt.time ? `${appt.time}` : '';
             const fullTimeStr = timeText ? `${timeText} (${periodText})` : periodText;
 
-            const message = `Hey ${appt.name},\n\nYour ${appt.service} booking at My Parlour is confirmed! ‚ú®\n\nüìÖ Date: ${formattedDate}\n‚è∞ Time: ${fullTimeStr}\n\nWe look forward to giving you a wonderful experience! See you soon. üíñ`;
+            const message = `Hey ${appt.name},\n\nYour ${appt.service} booking at My Parlour is confirmed! Å7ø8\n\nî9›1 Date: ${formattedDate}\nÅ7Å4 Time: ${fullTimeStr}\n\nWe look forward to giving you a wonderful experience! See you soon. î9ÿ4`;
 
             openWhatsAppWithMessage(message);
 
@@ -485,7 +491,7 @@
                 return;
             }
 
-            const message = `Hey ${appt.name},\n\nThank you for visiting My Parlour today for your ${appt.service}! üíñ\n\nWe hope you loved your experience with us. How was your service? We would love to hear your feedback! ‚ú®\n\nLooking forward to seeing you again soon! Have a wonderful day ahead! üå∏`;
+            const message = `Hey ${appt.name},\n\nThank you for visiting My Parlour today for your ${appt.service}! î9ÿ4\n\nWe hope you loved your experience with us. How was your service? We would love to hear your feedback! Å7ø8\n\nLooking forward to seeing you again soon! Have a wonderful day ahead! î9µ4`;
 
             openWhatsAppWithMessage(message);
 
@@ -508,7 +514,7 @@
             const timeText = deletedApptCache.time ? `${deletedApptCache.time}` : '';
             const fullTimeStr = timeText ? `${timeText} (${periodText})` : periodText;
 
-            const cancelMessage = `Hey ${deletedApptCache.name},\n\nWe regret to inform you that your booking for ${deletedApptCache.service} scheduled on ${formattedDate} at ${fullTimeStr} at My Parlour has been cancelled. üå∏\n\nSorry for the inconvenience caused. Please feel free to reach out to us if you would like to reschedule.`;
+            const cancelMessage = `Hey ${deletedApptCache.name},\n\nWe regret to inform you that your booking for ${deletedApptCache.service} scheduled on ${formattedDate} at ${fullTimeStr} at My Parlour has been cancelled. î9µ4\n\nSorry for the inconvenience caused. Please feel free to reach out to us if you would like to reschedule.`;
 
             openWhatsAppWithMessage(cancelMessage);
             closeCancelWhatsappModal();
@@ -583,10 +589,10 @@
 
             if(period === 'Morning') {
                 morningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-pink-300 bg-pink-500 text-white shadow-sm transition";
-                eveningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-gray-200 bg-white hover:bg-pink-50 transition text-black";
+                eveningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-gray-200 bg-white hover:bg-pink-100 transition text-black";
             } else {
                 eveningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-pink-300 bg-pink-500 text-white shadow-sm transition";
-                morningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-gray-200 bg-white hover:bg-pink-50 transition text-black";
+                morningBtn.className = "py-1.5 text-xs font-semibold rounded-lg border border-gray-200 bg-white hover:bg-pink-100 transition text-black";
             }
         }
         setPeriod('Morning');
